@@ -67,7 +67,7 @@ public class AppTest {
         int[] source = { 1, 2, 3, 4 };
         int[] expected = { 3, 1, 4, 2 };
 
-        App.rotateInPlace(source, 2, true);
+        App.rotateInPlaceClockwise(source, 2);
         assertArrayEquals(expected, source);
     }
 
@@ -76,7 +76,7 @@ public class AppTest {
         int[] source = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         int[] expected = { 7, 4, 1, 8, 5, 2, 9, 6, 3 };
 
-        App.rotateInPlace(source, 3, true);
+        App.rotateInPlaceClockwise(source, 3);
         assertArrayEquals(expected, source);
     }
 
@@ -86,7 +86,7 @@ public class AppTest {
         int[] source = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
         int[] expected = { 13, 9, 5, 1, 14, 10, 6, 2, 15, 11, 7, 3, 16, 12, 8, 4 };
 
-        App.rotateInPlace(source, 4, true);
+        App.rotateInPlaceClockwise(source, 4);
         assertArrayEquals(expected, source);
     }
 }

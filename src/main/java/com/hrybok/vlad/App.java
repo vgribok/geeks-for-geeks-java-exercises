@@ -4,15 +4,11 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-/**
- * Hello world!
- */
 public final class App {
     private App() {
     }
 
     /**
-     * Says hello to the world.
      * @param args The arguments of the program.
      */
     public static void main(String[] args) {
@@ -22,7 +18,7 @@ public final class App {
             for(int i = 0 ; i < testCaseCount ; i++) {
                 final int matrixSize = Integer.parseInt(scanner.nextLine());
                 int[] array = ReadArray(scanner.nextLine());
-                rotateInPlace(array, matrixSize, true);
+                rotateInPlaceClockwise(array, matrixSize);
                 System.out.println(formatOutput(array));
             }
         }
@@ -43,25 +39,22 @@ public final class App {
                     .collect(Collectors.joining(" "));
     }
 
-    static void rotateInPlace(int[] array, int matrixSize, boolean clockWise) {
+    static void rotateInPlaceClockwise(int[] array, int matrixSize) {
         int layerCount = matrixSize/2 + matrixSize % 1;
         for(int layer = 0, layerSize = matrixSize ; layerSize > 1 && layer < layerCount ; layer++, layerSize -= 2) {
             int layerStartIndex = matrixSize * layer + layer;
-            rotateLayerInPlace(array, layerStartIndex, layerSize, matrixSize, clockWise);
+            rotateLayerInPlaceClockwise(array, layerStartIndex, layerSize, matrixSize);
         }
     }
 
     /**
      * Layers indexes go from 0 - the outermost, incrementing towards the center of the matrix
      */
-    private static void rotateLayerInPlace(int[] array, int startIndex, int layerSize, int matrixSize, boolean clockWise) {
+    private static void rotateLayerInPlaceClockwise(int[] array, int startIndex, int layerSize, int matrixSize) {
         for(int index = startIndex, limit = startIndex + layerSize - 1; index < limit ; index++) {
             for(int nextIndex, i = 0, sourceIndex = index ; i < 3 ; i++, sourceIndex = nextIndex)
             {
-                nextIndex = clockWise ? 
-                    getDestIndexForCounterRotation(sourceIndex, matrixSize):
-                    getDestIndexForClockwiseRotation(sourceIndex, matrixSize)
-                    ;
+                nextIndex = getDestIndexForCounterRotation(sourceIndex, matrixSize);
                 swapArrayElemsInPlace(array, sourceIndex, nextIndex);
             }
         }
@@ -81,7 +74,7 @@ public final class App {
         return destIndex;
     }
 
-    public static int getDestIndexForClockwiseRotation(int index, int matrixSize) {
+    static int getDestIndexForClockwiseRotation(int index, int matrixSize) {
         for(int i = 0 ; i < 3 ; i++) {
             index = getDestIndexForCounterRotation(index, matrixSize);
         }
