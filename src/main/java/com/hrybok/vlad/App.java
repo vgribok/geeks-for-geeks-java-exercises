@@ -43,13 +43,11 @@ public final class App {
                     .collect(Collectors.joining(" "));
     }
 
-    private static void rotateInPlace(int[] array, int matrixSize, boolean clockWise) {
+    static void rotateInPlace(int[] array, int matrixSize, boolean clockWise) {
         int layerCount = matrixSize/2 + matrixSize % 1;
         for(int layer = 0, layerSize = matrixSize ; layerSize > 1 && layer < layerCount ; layer++, layerSize -= 2) {
             int layerStartIndex = matrixSize * layer + layer;
-            for(int index = layerStartIndex, itemCount = 0 ; itemCount < layerSize-1 ; index++, itemCount++) {
-                rotateLayerInPlace(array, index, layerSize, matrixSize, clockWise);
-            }
+            rotateLayerInPlace(array, layerStartIndex, layerSize, matrixSize, clockWise);
         }
     }
 
@@ -57,12 +55,15 @@ public final class App {
      * Layers indexes go from 0 - the outermost, incrementing towards the center of the matrix
      */
     private static void rotateLayerInPlace(int[] array, int startIndex, int layerSize, int matrixSize, boolean clockWise) {
-        int nextIndex;
-        for(int index = startIndex, countdown = layerSize - 1 ; countdown >= 0 ; countdown--, index = nextIndex) {
-            nextIndex = clockWise ? 
-                getDestIndexForClockwiseRotation(index, matrixSize) : 
-                getDestIndexForCounterRotation(index, matrixSize);
-            swapArrayElemsInPlace(array, index, nextIndex);
+        for(int index = startIndex, limit = startIndex + layerSize - 1; index < limit ; index++) {
+            for(int nextIndex, i = 0, sourceIndex = index ; i < 3 ; i++, sourceIndex = nextIndex)
+            {
+                nextIndex = clockWise ? 
+                    getDestIndexForCounterRotation(sourceIndex, matrixSize):
+                    getDestIndexForClockwiseRotation(sourceIndex, matrixSize)
+                    ;
+                swapArrayElemsInPlace(array, sourceIndex, nextIndex);
+            }
         }
     }
 
