@@ -46,6 +46,55 @@ public final class App {
         return nums;
     }
 
+    static class SeriesWalker extends Thread {
+        long[] histrogram;
+        int boundIndex = -1;
+        int seriesStartIndex;
+
+        SeriesWalker(int seriesStartIndex, long[] histrogram) {
+            this.histrogram = histrogram;
+            this.seriesStartIndex = seriesStartIndex;
+        }
+
+        long getSeriesHeight() {
+            return this.histrogram[this.seriesStartIndex];
+        }
+    }
+
+    static class SeriesRightWalker extends SeriesWalker {
+        SeriesRightWalker(int seriesStartIndex, long[] histrogram) {
+            super(seriesStartIndex, histrogram);
+        }
+
+        @Override
+        public void run() {
+
+            long seriesHeight = this.getSeriesHeight();
+
+            for(this.boundIndex = this.seriesStartIndex ; 
+                this.boundIndex < this.histrogram.length-1 && seriesHeight <= histrogram[this.boundIndex+1] ; 
+                this.boundIndex++)
+            ;
+        }
+    }
+
+    static class SeriesLeftWalker extends SeriesWalker {
+        SeriesLeftWalker(int seriesStartIndex, long[] histrogram) {
+            super(seriesStartIndex, histrogram);
+        }
+
+        @Override
+        public void run() {
+
+            long seriesHeight = this.getSeriesHeight();
+
+            for(this.boundIndex = this.seriesStartIndex ; 
+                this.boundIndex > 0 && this.histrogram[this.boundIndex-1] >= seriesHeight; 
+                this.boundIndex--)
+            ;
+        }
+    }
+
     static SeriesInfo getMaximumArea(long[] histrogram) {
         long maxArea = 0;
 
@@ -55,26 +104,27 @@ public final class App {
 
             long seriesHeight = histrogram[seriesStart];
 
-            int seriesLeft = 0;
-            int seriesRight = 0;
-            // Walk left
-            for(seriesLeft = seriesStart ; 
-                seriesLeft > 0 && histrogram[seriesLeft-1] >= seriesHeight; 
-                seriesLeft--)
-            ;
+            SeriesLeftWalker leftWalker = new SeriesLeftWalker(seriesStart, histrogram);
+            leftWalker.start();
+            SeriesRightWalker rightWalker = new SeriesRightWalker(seriesStart, histrogram);
+            rightWalker.start();
 
-            // Walk right
-            for(seriesRight = seriesStart ; 
-                seriesRight < histrogram.length-1 && seriesHeight <= histrogram[seriesRight+1] ; 
-                seriesRight++)
-            ;
+            try
+            {
+                leftWalker.join();
+                rightWalker.join();
+            }
+            catch(InterruptedException ex) {
+                // TODO: log exception
+                return null;
+            }
 
-            int seriesWidth = seriesRight - seriesLeft + 1;
+            int seriesWidth = rightWalker.boundIndex - leftWalker.boundIndex + 1;
             long seriesArea = seriesHeight * seriesWidth;
 
             if(seriesArea > maxArea) {
                 maxArea = seriesArea;
-                seriesInfo.seriesStartIndex = seriesLeft;
+                seriesInfo.seriesStartIndex = leftWalker.boundIndex;
                 seriesInfo.seriesLength = seriesWidth;
                 seriesInfo.seriesHeight = seriesHeight;
             }

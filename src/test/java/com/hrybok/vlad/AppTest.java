@@ -28,6 +28,7 @@ public class AppTest {
             new TestCase(123, new long[] { 123 }),
             new TestCase(250, new long[] { 124, 0, 125, 126 }),
             new TestCase(10, new long[] { 6, 2, 5, 3, 5, 1, 6 }),
+            new TestCase(7, new long[] { 6, 2, 5, 1, 5, 1, 6 }),
         };
 
         for (TestCase testCase : testCases) {
