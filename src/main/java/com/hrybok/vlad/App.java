@@ -2,7 +2,6 @@ package com.hrybok.vlad;
 
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 /**
  * See  branches for specific GFG task solutions.
@@ -10,6 +9,16 @@ import java.util.stream.Collectors;
  */
 public final class App {
     private App() {
+    }
+
+    static class SeriesInfo {
+        int seriesStartIndex = -1;
+        int seriesLength = -1;
+        long seriesHeight = 0;
+
+        long getArea() {
+            return seriesHeight * seriesLength;
+        }
     }
 
     /**
@@ -20,26 +29,57 @@ public final class App {
         {
             final int testCaseCount = Integer.parseInt(scanner.nextLine());
             for(int i = 0 ; i < testCaseCount ; i++) {
-                //final int size = Integer.parseInt(scanner.nextLine());
-                int[] array = ReadArray(scanner.nextLine());
-                // do something 
-                System.out.println(formatOutput(array));
+                scanner.nextLine(); // Array size will be determined dynamcally
+                long[] array = ReadArray(scanner.nextLine());
+                SeriesInfo maxAreaSeries = getMaximumArea(array);
+                System.out.println(Long.toString(maxAreaSeries.getArea()));
             }
         }
     }
 
-    private static int[] ReadArray(String arrayString) {
+    private static long[] ReadArray(String arrayString) {
         final String[] arrayNumbers = arrayString.split(" ");
-        final int[] nums = Arrays.stream(arrayNumbers)
-                                    .map(stringNumber -> Integer.parseInt(stringNumber))
-                                    .mapToInt(i -> i)
+        final long[] nums = Arrays.stream(arrayNumbers)
+                                    .map(stringNumber -> Long.parseLong(stringNumber))
+                                    .mapToLong(i -> i)
                                     .toArray();
         return nums;
     }
 
-    private static String formatOutput(int[] array) {
-        return Arrays.stream(array)
-                    .mapToObj(String::valueOf)
-                    .collect(Collectors.joining(" "));
+    static SeriesInfo getMaximumArea(long[] histrogram) {
+        long maxArea = 0;
+
+        SeriesInfo seriesInfo = new SeriesInfo();
+        
+        for(int seriesStart = 0 ; seriesStart < histrogram.length ; seriesStart++) {
+
+            long seriesHeight = histrogram[seriesStart];
+
+            int seriesLeft = 0;
+            int seriesRight = 0;
+            // Walk left
+            for(seriesLeft = seriesStart ; 
+                seriesLeft > 0 && histrogram[seriesLeft-1] >= seriesHeight; 
+                seriesLeft--)
+            ;
+
+            // Walk right
+            for(seriesRight = seriesStart ; 
+                seriesRight < histrogram.length-1 && seriesHeight <= histrogram[seriesRight+1] ; 
+                seriesRight++)
+            ;
+
+            int seriesWidth = seriesRight - seriesLeft + 1;
+            long seriesArea = seriesHeight * seriesWidth;
+
+            if(seriesArea > maxArea) {
+                maxArea = seriesArea;
+                seriesInfo.seriesStartIndex = seriesLeft;
+                seriesInfo.seriesLength = seriesWidth;
+                seriesInfo.seriesHeight = seriesHeight;
+            }
+        }
+
+        return seriesInfo;
     }
 }
