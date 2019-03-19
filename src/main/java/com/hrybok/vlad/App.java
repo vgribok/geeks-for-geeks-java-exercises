@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 /**
- * See  branches for specific GFG task solutions.
- * This is just a starting point for tasks.
+ * Geeks for Geeks (GFG) "Maximum Rectangular Area in a Histogram" task
+ * https://practice.geeksforgeeks.org/problems/maximum-rectangular-area-in-a-histogram/0
  */
 public final class App {
     private App() {
@@ -46,85 +46,37 @@ public final class App {
         return nums;
     }
 
-    static class SeriesWalker extends Thread {
-        long[] histrogram;
-        int boundIndex = -1;
-        int seriesStartIndex;
-
-        SeriesWalker(int seriesStartIndex, long[] histrogram) {
-            this.histrogram = histrogram;
-            this.seriesStartIndex = seriesStartIndex;
-        }
-
-        long getSeriesHeight() {
-            return this.histrogram[this.seriesStartIndex];
-        }
-    }
-
-    static class SeriesRightWalker extends SeriesWalker {
-        SeriesRightWalker(int seriesStartIndex, long[] histrogram) {
-            super(seriesStartIndex, histrogram);
-        }
-
-        @Override
-        public void run() {
-
-            long seriesHeight = this.getSeriesHeight();
-
-            for(this.boundIndex = this.seriesStartIndex ; 
-                this.boundIndex < this.histrogram.length-1 && seriesHeight <= histrogram[this.boundIndex+1] ; 
-                this.boundIndex++)
-            ;
-        }
-    }
-
-    static class SeriesLeftWalker extends SeriesWalker {
-        SeriesLeftWalker(int seriesStartIndex, long[] histrogram) {
-            super(seriesStartIndex, histrogram);
-        }
-
-        @Override
-        public void run() {
-
-            long seriesHeight = this.getSeriesHeight();
-
-            for(this.boundIndex = this.seriesStartIndex ; 
-                this.boundIndex > 0 && this.histrogram[this.boundIndex-1] >= seriesHeight; 
-                this.boundIndex--)
-            ;
-        }
-    }
-
     static SeriesInfo getMaximumArea(long[] histrogram) {
         long maxArea = 0;
 
         SeriesInfo seriesInfo = new SeriesInfo();
-        
+
         for(int seriesStart = 0 ; seriesStart < histrogram.length ; seriesStart++) {
 
             long seriesHeight = histrogram[seriesStart];
-
-            SeriesLeftWalker leftWalker = new SeriesLeftWalker(seriesStart, histrogram);
-            leftWalker.start();
-            SeriesRightWalker rightWalker = new SeriesRightWalker(seriesStart, histrogram);
-            rightWalker.start();
-
-            try
-            {
-                leftWalker.join();
-                rightWalker.join();
-            }
-            catch(InterruptedException ex) {
-                // TODO: log exception
-                return null;
+            if(seriesHeight <= 0) {
+                continue;
             }
 
-            int seriesWidth = rightWalker.boundIndex - leftWalker.boundIndex + 1;
+            int seriesLeft, seriesRight;
+            // Walk left
+            for(seriesLeft = seriesStart ; 
+                seriesLeft > 0 && histrogram[seriesLeft-1] >= seriesHeight; 
+                seriesLeft--)
+            ;
+
+            // Walk right
+            for(seriesRight = seriesStart ; 
+                seriesRight < histrogram.length-1 && seriesHeight <= histrogram[seriesRight+1] ; 
+                seriesRight++)
+            ;
+
+            int seriesWidth = seriesRight - seriesLeft + 1;
             long seriesArea = seriesHeight * seriesWidth;
 
             if(seriesArea > maxArea) {
                 maxArea = seriesArea;
-                seriesInfo.seriesStartIndex = leftWalker.boundIndex;
+                seriesInfo.seriesStartIndex = seriesLeft;
                 seriesInfo.seriesLength = seriesWidth;
                 seriesInfo.seriesHeight = seriesHeight;
             }
