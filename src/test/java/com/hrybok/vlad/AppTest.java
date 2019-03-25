@@ -9,7 +9,8 @@ import static org.junit.Assert.*;
  */
 public class AppTest {
     @Test
-    public void doSomething() {
-        assertTrue(true);
+    public void testReverseBits() {
+        assertEquals(2684354560l, App.reverseBits(5));
+        assertEquals(2147483648l, App.reverseBits(1));
     }
 }
