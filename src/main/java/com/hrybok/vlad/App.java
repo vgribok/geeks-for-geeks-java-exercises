@@ -1,8 +1,6 @@
 package com.hrybok.vlad;
 
-import java.util.Arrays;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 /**
  * See  branches for specific GFG task solutions.
@@ -21,25 +19,58 @@ public final class App {
             final int testCaseCount = Integer.parseInt(scanner.nextLine());
             for(int i = 0 ; i < testCaseCount ; i++) {
                 //final int size = Integer.parseInt(scanner.nextLine());
-                int[] array = ReadArray(scanner.nextLine());
+                String moves = scanner.nextLine();
+
+                boolean circular = isMovementCircular(moves);
+
                 // do something 
-                System.out.println(formatOutput(array));
+                System.out.println(circular ? "Circular" : "Not Circular");
             }
         }
     }
 
-    private static int[] ReadArray(String arrayString) {
-        final String[] arrayNumbers = arrayString.split(" ");
-        final int[] nums = Arrays.stream(arrayNumbers)
-                                    .map(stringNumber -> Integer.parseInt(stringNumber))
-                                    .mapToInt(i -> i)
-                                    .toArray();
-        return nums;
+    static class Direction {
+        int x;
+        int y;
+
+        Direction(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
     }
 
-    private static String formatOutput(int[] array) {
-        return Arrays.stream(array)
-                    .mapToObj(String::valueOf)
-                    .collect(Collectors.joining(" "));
+    static boolean isMovementCircular(String moves) {
+        char[] moveArray = moves.toUpperCase().toCharArray();
+
+        Direction[] directions = new Direction[] {
+            new Direction(1, 0),
+            new Direction(0, 1),
+            new Direction(-1, 0),
+            new Direction(0, -1)
+        };
+        
+        int direction = 0;
+        int x = 0, y = 0;
+
+        for(char move : moveArray) {
+            switch(move) {
+                case 'G':
+                    int directionIndex = direction % 4;
+                    if(directionIndex < 0) {
+                        directionIndex = -directionIndex;
+                    }
+                    x += directions[directionIndex].x;
+                    y += directions[directionIndex].y;
+                    continue;
+                case 'L':
+                    direction++;
+                    break;
+                case 'R':
+                    direction--;
+                    break;
+            }
+        }
+
+        return x == 0 && y == 0;
     }
 }
